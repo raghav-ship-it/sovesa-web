@@ -25,15 +25,20 @@ export async function GET() {
     }
 
     // Transform database records to match frontend Participant interface
-    const transformedData = (data || []).map(participant => ({
-      id: participant.id,
-      name: participant.name,
-      email: participant.email,
-      phone: participant.phone,
-      registrationTime: participant.created_at || new Date().toISOString(),
-      status: 'registered' as const, // Default status for existing participants
-      qrCode: participant.id, // Use participant ID as QR code identifier
-    }));
+    const transformedData = (data || []).map((participant: any) => {
+      if (!participant.created_at) {
+        throw new Error(`Missing created_at for participant with id: ${participant.id}. Please correct the database.`);
+      }
+      return {
+        id: participant.id,
+        name: participant.name,
+        email: participant.email,
+        phone: participant.phone,
+        registrationTime: participant.created_at,
+        status: 'registered' as const, // Default status for existing participants
+        qrCode: participant.id, // Use participant ID as QR code identifier
+      };
+    });
 
     return NextResponse.json({ success: true, data: transformedData });
   } catch (error) {
