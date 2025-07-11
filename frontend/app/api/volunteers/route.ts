@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getServiceRoleSupabaseClient } from '@/lib/supabase';
 import { auth } from "@/auth.js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = getServiceRoleSupabaseClient();
 
 // GET /api/volunteers - Get all volunteers
 export async function GET(request: Request) {
@@ -21,7 +18,7 @@ export async function GET(request: Request) {
     const { data, error } = await supabase
       .from('volunteers')
       .select('email')
-      .eq('email', email)
+      .eq('email', email as string)
       .single();
     if (error || !data) {
       return new Response(JSON.stringify({ isVolunteer: false }), { status: 200 });

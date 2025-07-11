@@ -1,10 +1,7 @@
-import { createClient } from '@supabase/supabase-js';
+import { getServiceRoleSupabaseClient } from '@/lib/supabase';
 import { auth } from "@/auth.js";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = getServiceRoleSupabaseClient();
 
 export async function GET(request: Request) {
   const session = await auth();

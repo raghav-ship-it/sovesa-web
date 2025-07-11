@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { getServiceRoleSupabaseClient } from '@/lib/supabase';
 import { auth } from '../../../auth';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = getServiceRoleSupabaseClient();
 
 // POST /api/scan - Process QR code scan
 export async function POST(request: NextRequest) {
@@ -40,7 +37,7 @@ export async function POST(request: NextRequest) {
     const { error: updateError } = await supabase
       .from('participants')
       .update({ status: 'scanned' })
-      .eq('id', participant.id);
+      .eq('id', participant.id as string);
 
     if (updateError) {
       console.error('Update error:', updateError);
