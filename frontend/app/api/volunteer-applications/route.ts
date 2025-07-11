@@ -5,6 +5,13 @@ import { auth } from "@/auth.js";
 // Initialize Supabase client with service role key for admin operations
 const supabase = getServiceRoleSupabaseClient();
 
+// Enum for volunteer application status
+export enum VolunteerApplicationStatus {
+  Pending = 'pending',
+  Approved = 'approved',
+  Rejected = 'rejected',
+}
+
 /**
  * POST /api/volunteer-applications - Submit a volunteer application
  * Requires authentication and duty_id, reason in request body
@@ -48,7 +55,7 @@ export async function POST(request: NextRequest) {
           email,
           duty_id,
           reason,
-          status: 'pending',
+          status: VolunteerApplicationStatus.Pending,
         },
       ])
       .select();
