@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { motion } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
 import Modal from '../../components/Modal';
-import { scanApi } from '../../lib/api';
+
 import styles from './success.module.css';
 
 export default function SuccessPage() {
@@ -65,6 +65,28 @@ export default function SuccessPage() {
     setWaitingForGiftScan(true);
   };
 
+  // Check if user is a volunteer and handle navigation
+  const handleVolunteerDashboard = async () => {
+    try {
+      const response = await fetch('/api/volunteers/me');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.isVolunteer) {
+          window.location.href = '/volunteer/dashboard';
+        } else {
+          // If not a volunteer, redirect to apply page
+          window.location.href = '/volunteer/apply';
+        }
+      } else {
+        // If API fails, redirect to apply page
+        window.location.href = '/volunteer/apply';
+      }
+    } catch (error) {
+      // If error, redirect to apply page
+      window.location.href = '/volunteer/apply';
+    }
+  };
+
   // Check if participant has been scanned
   const checkScanStatus = async () => {
     if (!session?.user?.email) return;
@@ -82,9 +104,21 @@ export default function SuccessPage() {
             setShowScanSuccess(true);
             setTimeout(() => setShowScanSuccess(false), 3000);
           }
+        }
+      }
+
+      // Check gift collection status
+      const giftResponse = await fetch(`/api/participants/${encodeURIComponent(session.user.email)}/gift-status`);
+      if (giftResponse.ok) {
+        const giftData = await giftResponse.json();
+        if (giftData.success && giftData.data) {
+          const { hasCollectedGift } = giftData.data;
           
-          // Check gift scan status (this would need a separate API endpoint)
-          // For now, we'll just show a generic success message
+          // Check gift collection status
+          if (hasCollectedGift && !showGiftScanSuccess) {
+            setShowGiftScanSuccess(true);
+            setTimeout(() => setShowGiftScanSuccess(false), 3000);
+          }
         }
       }
     } catch (error) {
@@ -211,16 +245,16 @@ export default function SuccessPage() {
         {/* Navigation */}
         <div className={styles.navigation}>
           <button
-            onClick={() => window.print()}
-            className={styles.printButton}
-          >
-            📄 Print Ticket
-          </button>
-          <button
             onClick={() => window.location.href = '/events'}
             className={styles.eventsButton}
           >
             📅 View Events
+          </button>
+          <button
+            onClick={handleVolunteerDashboard}
+            className={styles.eventsButton}
+          >
+            🧑‍🤝‍🧑 Volunteer Dashboard
           </button>
         </div>
 
@@ -307,6 +341,8 @@ export default function SuccessPage() {
             </div>
           </motion.div>
         )}
+
+
       </div>
     </div>
   );

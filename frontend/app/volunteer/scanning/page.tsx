@@ -91,7 +91,8 @@ export default function ScanningPage() {
           // Show success message
           console.log(`Successfully scanned: ${participant.name}`);
         } else {
-          console.error('Scan failed:', response.error);
+          // Show error to volunteer
+          setError(response.error || 'Scan failed');
         }
       } catch (err) {
         console.error('Scan error:', err);
@@ -134,20 +135,20 @@ export default function ScanningPage() {
         animate={{ opacity: 1, y: 0 }}
         className="bg-white/10 backdrop-blur-sm p-4"
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-3">
             <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center">
               <span className="text-2xl">🕉️</span>
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white">Scanning Desk</h1>
-              <p className="text-blue-200">Welcome, {session.user?.name}</p>
+              <p className="text-blue-200 text-sm md:text-base">Welcome, {session.user?.name}</p>
             </div>
           </div>
-          <div className="flex space-x-3">
+          <div className="flex space-x-3 w-full md:w-auto justify-end">
             <button
               onClick={() => router.push('/volunteer/dashboard')}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors w-full md:w-auto"
             >
               Back to Dashboard
             </button>
@@ -155,82 +156,71 @@ export default function ScanningPage() {
         </div>
       </motion.div>
 
-      <div className="max-w-7xl mx-auto p-4">
-        <div className="grid grid-cols-5 gap-6 h-[calc(100vh-200px)]">
-          {/* Scanner Section - 60% */}
-          <div className="col-span-3 bg-white/10 backdrop-blur-sm rounded-2xl p-6">
-            <div className="h-full flex flex-col">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">QR Code Scanner</h2>
+      <div className="max-w-7xl mx-auto p-2 md:p-4">
+        <div className="flex flex-col md:grid md:grid-cols-5 gap-4 md:gap-6 min-h-[calc(100vh-200px)]">
+          {/* Scanner Section - 100% on mobile, 60% on desktop */}
+          <div className="col-span-3 bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 flex flex-col mb-4 md:mb-0">
+            <div className="flex flex-col md:flex-row items-center justify-between mb-4 gap-2">
+              <h2 className="text-xl md:text-2xl font-bold text-white">QR Code Scanner</h2>
+              <div className="flex gap-2 w-full md:w-auto">
                 {!isScanning ? (
                   <button
                     onClick={handleStartScanning}
-                    className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+                    className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition-colors font-semibold w-full md:w-auto"
                   >
                     Start Scanning
                   </button>
                 ) : (
                   <button
                     onClick={handleStopScanning}
-                    className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg transition-colors font-semibold"
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors font-semibold w-full md:w-auto"
                   >
                     Stop Scanning
                   </button>
                 )}
               </div>
+            </div>
 
-              <div className="flex-1 flex items-center justify-center">
+            <div className="flex-1 flex items-center justify-center w-full">
+              <div className="w-full max-w-xs md:max-w-md mx-auto">
                 <QRScanner onScan={handleScan} isScanning={isScanning} />
                 {scannedCode && (
-                  <div className="bg-green-500/20 text-green-300 p-4 rounded-lg mt-4">
+                  <div className="bg-green-500/20 text-green-300 p-4 rounded-lg mt-4 text-center text-sm">
                     Processing scan: {scannedCode}
                   </div>
                 )}
               </div>
-
-              {/* Recent Scans */}
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold text-white mb-3">Recent Scans</h3>
-                <div className="grid grid-cols-2 gap-3">
-                  {recentScans.map((participant) => (
-                    <div
-                      key={participant.id}
-                      className="bg-white/5 rounded-lg p-3"
-                    >
-                      <div className="text-white font-medium">{participant.name}</div>
-                      <div className="text-blue-200 text-sm">{participant.phone}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
 
-          {/* Participants List - 40% */}
-          <div className="col-span-2 bg-white/10 backdrop-blur-sm rounded-2xl p-6">
-            <h2 className="text-2xl font-bold text-white mb-6">Participants</h2>
-            <div className="h-full overflow-y-auto space-y-3">
-              {participants.map((participant) => (
-                <motion.div
+          {/* Right Column: Recent Scans + Participants List */}
+          <div className="col-span-2 bg-white/10 backdrop-blur-sm rounded-2xl p-4 md:p-6 flex flex-col">
+            {/* Recent Scans */}
+            <h3 className="text-lg md:text-xl font-semibold text-white mb-3">Recent Scans</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+              {recentScans.map((participant) => (
+                <div
                   key={participant.id}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="bg-white/5 rounded-lg p-4 hover:bg-white/10 transition-colors"
+                  className="bg-white/5 rounded-lg p-3 flex flex-col items-start"
                 >
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-white font-semibold">{participant.name}</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(participant.status)}`}>
-                      {participant.status.replace('-', ' ')}
-                    </span>
-                  </div>
-                  <div className="text-blue-200 text-sm space-y-1">
-                    <div>{participant.email}</div>
-                    <div>{participant.phone}</div>
-                    <div className="text-xs text-blue-300">
-                      Registered: {participant.registrationTime}
-                    </div>
-                  </div>
-                </motion.div>
+                  <div className="text-white font-medium text-base md:text-lg">{participant.name}</div>
+                  <div className="text-blue-200 text-xs md:text-sm">{participant.email}</div>
+                  <div className={`mt-1 px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(participant.status)}`}>{participant.status}</div>
+                </div>
+              ))}
+            </div>
+            {/* Participants List */}
+            <h3 className="text-lg md:text-xl font-semibold text-white mb-2 mt-2">All Participants</h3>
+            <div className="overflow-y-auto" style={{ maxHeight: '220px' }}>
+              {participants.map((participant) => (
+                <div
+                  key={participant.id}
+                  className="bg-white/5 rounded-lg p-3 flex flex-col items-start mb-2"
+                >
+                  <div className="text-white font-medium text-base md:text-lg">{participant.name}</div>
+                  <div className="text-blue-200 text-xs md:text-sm">{participant.email}</div>
+                  <div className={`mt-1 px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(participant.status)}`}>{participant.status}</div>
+                </div>
               ))}
             </div>
           </div>

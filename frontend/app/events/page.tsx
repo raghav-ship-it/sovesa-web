@@ -43,10 +43,6 @@ export default function EventsPage() {
     checkRegistrationStatus();
   }, [session?.user?.email]);
 
-  const handleSignUp = () => {
-    router.push('/signup');
-  };
-
   const handleViewTicket = () => {
     router.push('/success');
   };
@@ -295,7 +291,7 @@ export default function EventsPage() {
               onClick={handleViewTicket}
               className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
             >
-              🎫 View My Ticket
+              🎫 View Ticket
             </button>
           ) : (
             <button

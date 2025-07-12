@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
     const { data: giftLog, error: giftLogError } = await supabase
       .from('gift_logs')
       .select('*')
-      .eq('participant_id', participant.id)
+      .eq('participant_id', participant.id as string)
       .eq('gift_code', qrInfo.giftCode)
       .single();
 

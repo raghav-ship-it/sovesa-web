@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { useSession } from 'next-auth/react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useInView } from 'framer-motion';
 import Image from 'next/image';
 import useEmblaCarousel from 'embla-carousel-react';
@@ -124,9 +124,65 @@ export default function HomePage() {
   // Navbar shrinks and fades as you scroll down
   const navScale = useTransform(scrollY, [0, 80], [1, 0.92]);
   const navOpacity = useTransform(scrollY, [0, 80], [1, 0.7]);
+  const [showPendingPopup, setShowPendingPopup] = useState(false);
+
+  const handleVolunteerClick = async () => {
+    if (!session?.user?.email) {
+      window.location.href = '/volunteer/apply';
+      return;
+    }
+    try {
+      const res = await fetch(`/api/volunteer-applications?email=${encodeURIComponent(session.user.email)}`);
+      const data = await res.json();
+      if (data.success && data.data && data.data.length > 0) {
+        const status = data.data[0].status;
+        if (status === 'approved') {
+          window.location.href = '/volunteer/dashboard';
+        } else if (status === 'pending') {
+          setShowPendingPopup(true);
+          setTimeout(() => setShowPendingPopup(false), 2000);
+        } else {
+          window.location.href = '/volunteer/apply';
+        }
+      } else {
+        window.location.href = '/volunteer/apply';
+      }
+    } catch {
+      window.location.href = '/volunteer/apply';
+    }
+  };
 
   return (
-    <div className="p-4 pb-24 min-h-screen bg-white relative">
+    <div className="relative min-h-screen bg-white">
+      {/* Top right profile and volunteer button */}
+      <div className="absolute top-6 right-6 flex flex-col items-center z-20">
+        {session?.user?.image && (
+          <img
+            src={session.user.image}
+            alt="Profile"
+            className="w-12 h-12 rounded-full border-2 border-green-600 shadow-md mb-2"
+          />
+        )}
+        <button
+          onClick={handleVolunteerClick}
+          className="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2 rounded-lg font-semibold shadow-lg transition-colors"
+        >
+          Volunteer
+        </button>
+      </div>
+
+      {/* Main navigation bar (without Volunteer) */}
+      <motion.nav
+        className="flex flex-wrap gap-4 justify-center mb-8"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <Link href="/courses" className="text-green-700 font-semibold hover:text-green-900 transition">Courses</Link>
+        <Link href="/trips" className="text-green-700 font-semibold hover:text-green-900 transition">Trips</Link>
+        <Link href="/events" className="text-green-700 font-semibold hover:text-green-900 transition">Events</Link>
+        <Link href="/bazaar" className="text-green-700 font-semibold hover:text-green-900 transition">Bazaar</Link>
+      </motion.nav>
+
       {/* User profile picture at top right if authenticated */}
       <AnimatePresence>
         {user?.image && (
@@ -151,25 +207,20 @@ export default function HomePage() {
           </motion.div>
         )}
       </AnimatePresence>
+      {showPendingPopup && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-black bg-opacity-50 absolute inset-0"></div>
+          <div className="bg-white rounded-2xl p-8 text-center shadow-2xl max-w-sm mx-4 relative z-10">
+            <div className="text-6xl mb-4">⏳</div>
+            <h2 className="text-xl font-bold text-gray-800 mb-2">Application Pending</h2>
+            <p className="text-gray-600">The admin is still reviewing your request.</p>
+          </div>
+        </div>
+      )}
       <HorizontalScroll title="Courses" items={courses} basePath="/courses" delay={0.05} />
       <HorizontalScroll title="Trips" items={trips} basePath="/trips" delay={0.15} />
       <HorizontalScroll title="Events" items={events} basePath="/events" delay={0.25} />
       <HorizontalScroll title="Bazaar" items={bazaar} basePath="/bazaar" delay={0.35} />
-
-      <motion.nav
-        ref={navRef}
-        className="fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-3 z-10 shadow-lg"
-        style={{ scale: navScale, opacity: navOpacity }}
-        initial={{ y: 80, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 120, damping: 14, delay: 0.5 }}
-        layout
-      >
-        <Link href="/courses" className="text-green-700 font-semibold hover:text-green-900 transition">Courses</Link>
-        <Link href="/trips" className="text-green-700 font-semibold hover:text-green-900 transition">Trips</Link>
-        <Link href="/events" className="text-green-700 font-semibold hover:text-green-900 transition">Events</Link>
-        <Link href="/bazaar" className="text-green-700 font-semibold hover:text-green-900 transition">Bazaar</Link>
-      </motion.nav>
     </div>
   );
 }
