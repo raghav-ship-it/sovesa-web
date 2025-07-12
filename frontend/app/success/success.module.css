@@ -53,10 +53,19 @@
   text-align: center;
 }
 .ticketGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
 }
+
+@media (min-width: 768px) {
+  .ticketGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+  }
+}
+
 .participantDetails, .eventInfo {
   background: rgba(59,130,246,0.12);
   border-radius: 0.75rem;
@@ -78,10 +87,19 @@
 }
 
 .qrGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
   margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+  .qrGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
 }
 .qrBlock {
   background: rgba(255,255,255,0.08);
@@ -166,10 +184,19 @@
   font-size: 1.25rem;
 }
 .instructionsGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
   text-align: center;
+}
+
+@media (min-width: 768px) {
+  .instructionsGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+    text-align: center;
+  }
 }
 .instructionStep {
   background: rgba(59,130,246,0.12);

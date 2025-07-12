@@ -391,6 +391,58 @@ export const scanApi = {
   },
 
   /**
+   * Process attendance QR code scan
+   * @param qrData - QR code data containing attendance information
+   * @param volunteerId - ID of the volunteer performing the scan
+   * @returns Promise<ApiResponse<any>> - Attendance scan result
+   */
+  async processAttendanceScan(qrData: string, volunteerId?: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await fetch('/api/scan/attendance', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ qrData, volunteerId }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        return { success: true, data };
+      } else {
+        return { success: false, error: data.message };
+      }
+    } catch (error) {
+      return { success: false, error: 'Failed to process attendance scan' };
+    }
+  },
+
+  /**
+   * Process gift QR code scan
+   * @param qrData - QR code data containing gift information
+   * @param volunteerId - ID of the volunteer performing the scan
+   * @returns Promise<ApiResponse<any>> - Gift scan result
+   */
+  async processGiftScan(qrData: string, volunteerId?: string): Promise<ApiResponse<any>> {
+    try {
+      const response = await fetch('/api/scan/gift', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ qrData, volunteerId }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        return { success: true, data };
+      } else {
+        return { success: false, error: data.message };
+      }
+    } catch (error) {
+      return { success: false, error: 'Failed to process gift scan' };
+    }
+  },
+
+  /**
    * Get scanning statistics
    * @returns Promise<ApiResponse<any>> - Scan statistics
    */

@@ -13,9 +13,12 @@ export async function GET(request: Request) {
   const { data, error } = await supabase
     .from('volunteers')
     .select('email')
-    .eq('email', email)
+    .eq('email', email as string)
     .single();
-  if (error || !data) {
+  if (error) {
+    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+  }
+  if (!data) {
     return new Response(JSON.stringify({ isVolunteer: false }), { status: 200 });
   }
   return new Response(JSON.stringify({ isVolunteer: true }), { status: 200 });

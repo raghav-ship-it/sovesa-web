@@ -16,9 +16,39 @@ export default function EventsPage() {
   const [phoneError, setPhoneError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMsg, setSubmitMsg] = useState('');
+  const [isRegistered, setIsRegistered] = useState(false);
+  const [isCheckingRegistration, setIsCheckingRegistration] = useState(true);
+
+  // Check if user is already registered
+  useEffect(() => {
+    const checkRegistrationStatus = async () => {
+      if (!session?.user?.email) {
+        setIsCheckingRegistration(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/participants?email=${session.user.email}`);
+        if (response.ok) {
+          const data = await response.json();
+          setIsRegistered(data.success && data.data && data.data.length > 0);
+        }
+      } catch (error) {
+        console.error('Error checking registration status:', error);
+      } finally {
+        setIsCheckingRegistration(false);
+      }
+    };
+
+    checkRegistrationStatus();
+  }, [session?.user?.email]);
 
   const handleSignUp = () => {
     router.push('/signup');
+  };
+
+  const handleViewTicket = () => {
+    router.push('/success');
   };
 
   const handleRegister = async () => {
@@ -38,6 +68,7 @@ export default function EventsPage() {
         setPhoneError('');
         setIsSubmitting(false);
         setSubmitMsg('');
+        setIsRegistered(true);
         router.push('/success');
       }, 1500);
     } else {
@@ -247,19 +278,33 @@ export default function EventsPage() {
           </div>
         </motion.div>
 
-        {/* Sign Up Button */}
+        {/* Action Button */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.8 }}
           className="text-center"
         >
-          <button
-            onClick={handleOpenModal}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-          >
-            Register as Participant
-          </button>
+          {isCheckingRegistration ? (
+            <div className="text-white">
+              <div className="w-6 h-6 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+              <p>Checking registration status...</p>
+            </div>
+          ) : isRegistered ? (
+            <button
+              onClick={handleViewTicket}
+              className="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            >
+              🎫 View My Ticket
+            </button>
+          ) : (
+            <button
+              onClick={handleOpenModal}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            >
+              Register as Participant
+            </button>
+          )}
         </motion.div>
       </div>
       {showModal && (
