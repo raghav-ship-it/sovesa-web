@@ -6,25 +6,6 @@ const supabase = getServiceRoleSupabaseClient();
 
 // GET /api/volunteers - Get all volunteers
 export async function GET(request: Request) {
-  // Check if this is a request to /api/volunteers/me
-  if (request.url.endsWith('/me')) {
-    const session = await auth();
-    const user = session?.user;
-    if (!user) {
-      return new Response(JSON.stringify({ isVolunteer: false }), { status: 200 });
-    }
-    const { email } = user;
-    console.log("Checking volunteer for email:", email);
-    const { data, error } = await supabase
-      .from('volunteers')
-      .select('email')
-      .eq('email', email as string)
-      .single();
-    if (error || !data) {
-      return new Response(JSON.stringify({ isVolunteer: false }), { status: 200 });
-    }
-    return new Response(JSON.stringify({ isVolunteer: true }), { status: 200 });
-  }
   try {
     const { data, error } = await supabase
       .from('volunteers')
