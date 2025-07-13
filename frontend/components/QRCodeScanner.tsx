@@ -89,8 +89,8 @@ export default function QRCodeScanner({
       <div className="w-80 h-80 bg-white/5 rounded-2xl border-2 border-dashed border-yellow-400 flex items-center justify-center mb-4 overflow-hidden relative">
         <div className="w-full h-full rounded-2xl overflow-hidden">
           <Scanner
-            onResult={handleScanResult}
-            onError={handleScanError}
+            onScan={(result: any) => handleScanResult(result)}
+            onError={(error) => handleScanError(error)}
           />
         </div>
         
