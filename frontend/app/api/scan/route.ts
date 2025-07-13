@@ -25,7 +25,6 @@ export async function POST(request: NextRequest) {
     if (participantError || !participant) {
       return NextResponse.json(
         { 
-          success: false, 
           message: 'Participant not found',
           scanTime: new Date().toISOString()
         },
@@ -43,7 +42,6 @@ export async function POST(request: NextRequest) {
       console.error('Update error:', updateError);
       return NextResponse.json(
         { 
-          success: false, 
           message: 'Failed to update participant status',
           scanTime: new Date().toISOString()
         },
@@ -76,7 +74,6 @@ export async function POST(request: NextRequest) {
     };
 
     return NextResponse.json({
-      success: true,
       scanResult,
       participant: { ...participant, status: 'scanned' }
     });
@@ -85,7 +82,6 @@ export async function POST(request: NextRequest) {
     console.error('Scan error:', error);
     return NextResponse.json(
       { 
-        success: false, 
         message: 'Failed to process scan',
         scanTime: new Date().toISOString()
       },

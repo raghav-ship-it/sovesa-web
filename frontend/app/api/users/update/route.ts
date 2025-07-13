@@ -96,7 +96,6 @@ export async function PUT(req: NextRequest) {
     
     if (updateResponse.ok) {
       return NextResponse.json({ 
-        success: true,
         message: 'User data updated successfully!',
         updatedFields: Object.keys(updateFields)
       });
@@ -106,7 +105,7 @@ export async function PUT(req: NextRequest) {
         details: updateResult 
       }, { status: updateResponse.status });
     }
-  } catch (error: unknown) {
+  } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error("Error in update API:", error);
     return NextResponse.json({ error: errorMessage }, { status: 500 });

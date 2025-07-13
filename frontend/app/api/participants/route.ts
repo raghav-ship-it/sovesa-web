@@ -19,7 +19,7 @@ export async function GET() {
     if (error) {
       console.error('Supabase error:', error);
       return NextResponse.json(
-        { success: false, error: 'Failed to fetch participants' },
+        { error: 'Failed to fetch participants' },
         { status: 500 }
       );
     }
@@ -41,11 +41,11 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ success: true, data: transformedData });
+    return NextResponse.json({ data: transformedData });
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch participants' },
+      { error: 'Failed to fetch participants' },
       { status: 500 }
     );
   }
@@ -126,7 +126,7 @@ export async function POST(req: Request) {
       qrCode: data[0].id,
     };
 
-    return new Response(JSON.stringify({ success: true, data: transformedParticipant }), { status: 201 });
+    return new Response(JSON.stringify({ data: transformedParticipant }), { status: 201 });
   } catch (error) {
     console.error('API error:', error);
     return new Response("Internal server error", { status: 500 });

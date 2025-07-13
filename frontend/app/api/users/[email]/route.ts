@@ -52,16 +52,14 @@ export async function GET(
     if (response.ok && result.records && result.records.length > 0) {
       // console.log(result.records);
       return NextResponse.json({ 
-        success: true,
         user: result.records[0]
       });
     } else {
       return NextResponse.json({ 
-        success: false,
         error: 'User not found'
       }, { status: 404 });
     }
-  } catch (error: unknown) {
+  } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error("Error in users API:", error);
     return NextResponse.json({ error: errorMessage }, { status: 500 });
